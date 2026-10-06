@@ -1,0 +1,99 @@
+@page
+@model ILovePDF.Pages.PdfNumberModel
+@{
+    ViewData["Title"] = "Numéroter les pages";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Numéroter les pages</h1>
+    <p class="lead text-secondary">Ajoutez une numérotation sur toutes les pages de votre PDF, avec aperçu en direct.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <form id="numberForm" class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div id="dropZone" class="drop-zone border-2 border-dashed rounded-4 p-4 text-center mb-4">
+                    <i class="bi bi-file-earmark-pdf text-danger fs-1"></i>
+                    <h6 class="mt-2 mb-1">Glissez votre PDF ici</h6>
+                    <p class="text-muted small mb-2">ou cliquez pour sélectionner un fichier</p>
+                    <input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden />
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="chooseFile">Choisir un PDF</button>
+                    <div id="fileInfo" class="mt-2 small fw-semibold d-none"></div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="format" class="form-label fw-semibold">Format</label>
+                        <select id="format" class="form-select">
+                            <option value="n">3</option>
+                            <option value="dash">- 3 -</option>
+                            <option value="page-n">Page 3</option>
+                            <option value="n-total" selected>3 / 10</option>
+                            <option value="page-n-total">Page 3 sur 10</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="position" class="form-label fw-semibold">Position</label>
+                        <select id="position" class="form-select">
+                            <option value="bottom-center" selected>Bas, centré</option>
+                            <option value="bottom-right">Bas, à droite</option>
+                            <option value="bottom-left">Bas, à gauche</option>
+                            <option value="top-center">Haut, centré</option>
+                            <option value="top-right">Haut, à droite</option>
+                            <option value="top-left">Haut, à gauche</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <label for="start" class="form-label fw-semibold">Début</label>
+                        <input id="start" type="number" class="form-control" min="0" max="100000" value="1" />
+                    </div>
+                    <div class="col-4">
+                        <label for="fontSize" class="form-label fw-semibold">Taille</label>
+                        <input id="fontSize" type="number" class="form-control" min="6" max="48" value="11" />
+                    </div>
+                    <div class="col-4">
+                        <label for="color" class="form-label fw-semibold">Couleur</label>
+                        <input id="color" type="color" class="form-control form-control-color w-100" value="#333333" />
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input id="skipFirst" class="form-check-input" type="checkbox" />
+                            <label class="form-check-label" for="skipFirst">Ne pas numéroter la première page (page de garde)</label>
+                        </div>
+                        <div class="form-text">« Début » est le numéro de la première page numérotée. Le total affiché correspond au dernier numéro.</div>
+                    </div>
+                </div>
+
+                <div id="alert" class="alert d-none mt-4 mb-0"></div>
+
+                <button id="submitBtn" type="submit" class="btn btn-danger btn-lg w-100 mt-4" disabled>
+                    <i class="bi bi-123 me-2"></i>Numéroter et télécharger
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="wm-preview-sticky">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-eye me-2"></i>Aperçu</h5>
+                    <div id="previewPlaceholder" class="wm-preview-placeholder text-muted text-center">
+                        <i class="bi bi-file-earmark-image display-4"></i>
+                        <p class="mt-2 mb-0">Chargez un PDF pour voir l’aperçu de la numérotation.</p>
+                    </div>
+                    <div id="previewWrap" class="num-preview d-none">
+                        <canvas id="pageCanvas"></canvas>
+                        <div id="numLabel" class="num-label"></div>
+                    </div>
+                    <div class="form-text mt-2">L’aperçu est indicatif : le rendu final peut différer très légèrement.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/pdf-number.js" asp-append-version="true"></script>
+}

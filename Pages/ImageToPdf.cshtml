@@ -1,0 +1,139 @@
+@page
+@model ILovePDF.Pages.ImageToPdfModel
+@{
+    ViewData["Title"] = "Images vers PDF";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Images vers PDF</h1>
+    <p class="lead text-secondary">Transformez plusieurs images en un seul fichier PDF.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div id="image-drop-zone" class="drop-zone p-5 text-center border-2 border-dashed rounded-4 bg-white shadow-sm mb-4">
+            <i class="bi bi-images text-danger display-1"></i>
+            <h4 class="mt-3">Glissez-déposez vos images ici</h4>
+            <p class="text-muted small mb-3">
+                JPG, JPEG, PNG ou BMP · @Model.MaxFileSizeMb Mo maximum par image ·
+                @Model.MaxFiles images maximum
+            </p>
+            <input type="file" id="image-file-input" multiple
+                   accept="image/jpeg,image/png,image/bmp" class="d-none" />
+            <button type="button" class="btn btn-danger btn-lg px-4"
+                    onclick="document.getElementById('image-file-input').click()">
+                <i class="bi bi-folder-plus me-2"></i>Choisir des images
+            </button>
+        </div>
+
+        <div id="image-alert-message" class="alert alert-danger d-none shadow-sm" role="alert"></div>
+
+        <div id="image-list-container" class="d-none">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-5">
+                            <label for="compression-level" class="form-label fw-bold mb-1">
+                                <i class="bi bi-arrows-collapse me-1"></i>Compression PDF
+                            </label>
+                            <select id="compression-level" class="form-select">
+                                <option value="None">Aucune — qualité maximale</option>
+                                <option value="Low">Faible — bonne qualité, fichier réduit</option>
+                                <option value="Medium" selected>Moyenne — bon compromis</option>
+                                <option value="High">Forte — fichier plus léger</option>
+                                <option value="Extreme">Extrême — taille minimale</option>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <div id="compression-description" class="small text-muted pt-md-4">
+                                Les images sont redimensionnées si nécessaire puis recompressées en JPEG.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="watermark-enabled">
+                        <label class="form-check-label fw-bold" for="watermark-enabled">
+                            <i class="bi bi-droplet me-1"></i>Ajouter un filigrane
+                        </label>
+                    </div>
+
+                    <div id="watermark-options" class="row g-3 d-none">
+                        <div class="col-md-6">
+                            <label for="watermark-text" class="form-label">Texte du filigrane</label>
+                            <input type="text" id="watermark-text" class="form-control"
+                                   maxlength="100" placeholder="Ex. CONFIDENTIEL">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="watermark-position" class="form-label">Position</label>
+                            <select id="watermark-position" class="form-select">
+                                <option value="Center" selected>Centre — diagonal</option>
+                                <option value="TopLeft">Haut gauche</option>
+                                <option value="TopRight">Haut droite</option>
+                                <option value="BottomLeft">Bas gauche</option>
+                                <option value="BottomRight">Bas droite</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="watermark-font-size" class="form-label">Taille</label>
+                            <select id="watermark-font-size" class="form-select">
+                                <option value="28">Petite</option>
+                                <option value="42" selected>Moyenne</option>
+                                <option value="60">Grande</option>
+                                <option value="80">Très grande</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="watermark-opacity" class="form-label">Opacité : <span id="watermark-opacity-value">25</span>%</label>
+                            <input type="range" id="watermark-opacity" class="form-range" min="5" max="80" value="25">
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="small text-muted">Le filigrane sera appliqué à chaque page du PDF.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold m-0">Ordre des images</h5>
+                <button type="button" class="btn btn-outline-secondary btn-sm"
+                        onclick="document.getElementById('image-file-input').click()">
+                    <i class="bi bi-plus-lg me-1"></i>Ajouter des images
+                </button>
+            </div>
+
+            <div id="image-list" class="row g-3 mb-4"></div>
+
+            <div class="d-grid gap-2">
+                <button id="image-to-pdf-btn" type="button"
+                        class="btn btn-danger btn-lg py-3 fw-bold">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>Créer le PDF
+                </button>
+            </div>
+        </div>
+
+        <div id="image-loading-overlay"
+             class="d-none text-center p-5 bg-white rounded-4 shadow-sm">
+            <div class="spinner-border text-danger mb-3"
+                 style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <h4 class="fw-bold">Création de votre PDF en cours...</h4>
+            <p class="text-muted mb-0">Veuillez patienter pendant la génération du fichier.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.imageToPdfConfig = {
+            maxFileSizeMb: @Model.MaxFileSizeMb,
+            maxFiles: @Model.MaxFiles
+        };
+    </script>
+    <script src="~/js/image-to-pdf.js" asp-append-version="true"></script>
+}

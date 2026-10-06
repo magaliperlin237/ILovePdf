@@ -1,0 +1,62 @@
+@page
+@model ILovePDF.Pages.PdfCompressModel
+@{
+    ViewData["Title"] = "Compresser un PDF";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Compresser un PDF</h1>
+    <p class="lead text-secondary">Réduisez le poids de votre PDF en recompressant les images qu’il contient.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <form id="compressForm" class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div id="dropZone" class="drop-zone border-2 border-dashed rounded-4 p-4 text-center mb-4">
+                    <i class="bi bi-file-earmark-pdf text-danger fs-1"></i>
+                    <h6 class="mt-2 mb-1">Glissez votre PDF ici</h6>
+                    <p class="text-muted small mb-2">ou cliquez pour sélectionner un fichier</p>
+                    <input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden />
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="chooseFile">Choisir un PDF</button>
+                    <div id="fileInfo" class="mt-2 small fw-semibold d-none"></div>
+                </div>
+
+                <div class="fw-semibold mb-2">Niveau de compression</div>
+                <div class="list-group mb-2">
+                    <label class="list-group-item d-flex gap-3 align-items-start">
+                        <input class="form-check-input mt-1" type="radio" name="level" value="low" />
+                        <span><span class="fw-semibold">Légère</span><br /><span class="small text-muted">Images jusqu’à 2 200 px, qualité 80 %. Presque aucune perte visible.</span></span>
+                    </label>
+                    <label class="list-group-item d-flex gap-3 align-items-start">
+                        <input class="form-check-input mt-1" type="radio" name="level" value="medium" checked />
+                        <span><span class="fw-semibold">Moyenne</span> <span class="badge text-bg-success ms-1">Recommandée</span><br /><span class="small text-muted">Images jusqu’à 1 600 px, qualité 65 %. Bon équilibre poids / qualité.</span></span>
+                    </label>
+                    <label class="list-group-item d-flex gap-3 align-items-start">
+                        <input class="form-check-input mt-1" type="radio" name="level" value="high" />
+                        <span><span class="fw-semibold">Forte</span><br /><span class="small text-muted">Images jusqu’à 1 200 px, qualité 50 %. Idéal pour l’envoi par e-mail.</span></span>
+                    </label>
+                    <label class="list-group-item d-flex gap-3 align-items-start">
+                        <input class="form-check-input mt-1" type="radio" name="level" value="extreme" />
+                        <span><span class="fw-semibold">Extrême</span><br /><span class="small text-muted">Images jusqu’à 900 px, qualité 35 %. Poids minimal, qualité réduite.</span></span>
+                    </label>
+                </div>
+                <div class="form-text">
+                    Seules les images JPEG intégrées sont recompressées ; le texte et les dessins vectoriels ne changent pas.
+                    Un PDF composé surtout de texte gagnera donc peu.
+                </div>
+
+                <div id="resultBox" class="alert alert-success d-none mt-4 mb-0"></div>
+                <div id="alert" class="alert d-none mt-4 mb-0"></div>
+
+                <button id="submitBtn" type="submit" class="btn btn-danger btn-lg w-100 mt-4" disabled>
+                    <i class="bi bi-file-earmark-zip me-2"></i>Compresser et télécharger
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/pdf-compress.js" asp-append-version="true"></script>
+}

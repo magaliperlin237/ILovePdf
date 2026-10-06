@@ -1,0 +1,152 @@
+@page
+@model ILovePDF.Pages.PdfWatermarkModel
+@{
+    ViewData["Title"] = "Filigrane PDF";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Filigrane PDF</h1>
+    <p class="lead text-secondary">Ajoutez un filigrane unique ou répété sur tout le document, avec aperçu en direct.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Colonne réglages -->
+    <div class="col-lg-5">
+        <form id="watermarkForm" class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <div id="dropZone" class="drop-zone border-2 border-dashed rounded-4 p-4 text-center mb-4">
+                    <i class="bi bi-file-earmark-pdf text-danger fs-1"></i>
+                    <h6 class="mt-2 mb-1">Glissez votre PDF ici</h6>
+                    <p class="text-muted small mb-2">ou cliquez pour sélectionner un fichier</p>
+                    <input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden />
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="chooseFile">Choisir un PDF</button>
+                    <div id="fileInfo" class="mt-2 small fw-semibold d-none"></div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-label fw-semibold">Type de filigrane</div>
+                    <div class="btn-group w-100" role="group" aria-label="Type de filigrane">
+                        <input type="radio" class="btn-check" name="wmMode" id="modeSingle" value="single" checked>
+                        <label class="btn btn-outline-danger" for="modeSingle">
+                            <i class="bi bi-bullseye me-1"></i>Unique
+                        </label>
+                        <input type="radio" class="btn-check" name="wmMode" id="modeTiled" value="tiled">
+                        <label class="btn btn-outline-danger" for="modeTiled">
+                            <i class="bi bi-grid-3x3-gap me-1"></i>Multiple (mosaïque)
+                        </label>
+                    </div>
+                    <div id="modeHelp" class="form-text"></div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-8">
+                        <label for="watermarkText" class="form-label fw-semibold">Texte</label>
+                        <input id="watermarkText" class="form-control" value="CONFIDENTIEL" maxlength="120" />
+                    </div>
+                    <div class="col-4">
+                        <label for="wmColor" class="form-label fw-semibold">Couleur</label>
+                        <input id="wmColor" type="color" class="form-control form-control-color w-100" value="#5a5a5a" />
+                    </div>
+
+                    <div class="col-6">
+                        <label for="fontSize" class="form-label fw-semibold">Taille <span id="fontSizeValue" class="text-muted">42 pt</span></label>
+                        <input id="fontSize" type="range" class="form-range" min="8" max="120" value="42" />
+                    </div>
+                    <div class="col-6">
+                        <label for="opacity" class="form-label fw-semibold">Opacité <span id="opacityValue" class="text-muted">25 %</span></label>
+                        <input id="opacity" type="range" class="form-range" min="5" max="100" value="25" />
+                    </div>
+
+                    <!-- Options du mode « Unique » -->
+                    <div id="singleOptions" class="col-12">
+                        <div class="row g-3">
+                            <div class="col-7">
+                                <label for="position" class="form-label fw-semibold">Position</label>
+                                <select id="position" class="form-select">
+                                    <option value="center">Centre</option>
+                                    <option value="top-left">Haut gauche</option>
+                                    <option value="top-right">Haut droite</option>
+                                    <option value="bottom-left">Bas gauche</option>
+                                    <option value="bottom-right">Bas droite</option>
+                                </select>
+                            </div>
+                            <div class="col-5 d-flex align-items-end">
+                                <div class="form-check form-switch mb-2">
+                                    <input id="diagonal" class="form-check-input" type="checkbox" checked />
+                                    <label class="form-check-label" for="diagonal">Incliné</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options du mode « Multiple » -->
+                    <div id="tiledOptions" class="col-12 d-none">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="spacing" class="form-label fw-semibold">Espacement <span id="spacingValue" class="text-muted">Moyen</span></label>
+                                <input id="spacing" type="range" class="form-range" min="10" max="100" step="5" value="50" />
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input id="stagger" class="form-check-input" type="checkbox" checked />
+                                    <label class="form-check-label" for="stagger">Décaler une ligne sur deux</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Angle : mode multiple, ou mode unique centré et incliné -->
+                    <div id="angleGroup" class="col-12">
+                        <label for="angle" class="form-label fw-semibold">Angle <span id="angleValue" class="text-muted">-35°</span></label>
+                        <input id="angle" type="range" class="form-range" min="-90" max="90" step="5" value="-35" />
+                    </div>
+                </div>
+
+                <div id="alert" class="alert d-none mt-4 mb-0"></div>
+
+                <button id="submitBtn" type="submit" class="btn btn-danger btn-lg w-100 mt-4" disabled>
+                    <i class="bi bi-droplet me-2"></i>Ajouter le filigrane et télécharger
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Colonne aperçu -->
+    <div class="col-lg-7">
+        <div class="wm-preview-sticky">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold m-0"><i class="bi bi-eye me-2"></i>Aperçu</h5>
+                        <div id="pageNav" class="btn-group btn-group-sm d-none">
+                            <button type="button" class="btn btn-outline-secondary" id="prevPage" title="Page précédente">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span class="btn btn-outline-secondary disabled" id="pageLabel">1 / 1</span>
+                            <button type="button" class="btn btn-outline-secondary" id="nextPage" title="Page suivante">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="previewPlaceholder" class="wm-preview-placeholder text-muted text-center">
+                        <i class="bi bi-file-earmark-image display-4"></i>
+                        <p class="mt-2 mb-0">Chargez un PDF pour voir l’aperçu de votre filigrane.</p>
+                    </div>
+
+                    <div id="previewWrap" class="wm-preview d-none">
+                        <canvas id="pageCanvas"></canvas>
+                        <canvas id="wmCanvas"></canvas>
+                    </div>
+
+                    <div class="form-text mt-2">L’aperçu est indicatif : le rendu final peut différer très légèrement.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/pdf-watermark.js" asp-append-version="true"></script>
+}

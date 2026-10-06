@@ -1,0 +1,77 @@
+@page
+@model ILovePDF.Pages.PdfProtectModel
+@{
+    ViewData["Title"] = "Protéger par mot de passe";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Protéger par mot de passe</h1>
+    <p class="lead text-secondary">Chiffrez votre PDF et choisissez ce que les lecteurs ont le droit de faire.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <form id="protectForm" class="card border-0 shadow-sm" autocomplete="off">
+            <div class="card-body p-4">
+                <div id="dropZone" class="drop-zone border-2 border-dashed rounded-4 p-4 text-center mb-4">
+                    <i class="bi bi-file-earmark-pdf text-danger fs-1"></i>
+                    <h6 class="mt-2 mb-1">Glissez votre PDF ici</h6>
+                    <p class="text-muted small mb-2">ou cliquez pour sélectionner un fichier</p>
+                    <input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden />
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="chooseFile">Choisir un PDF</button>
+                    <div id="fileInfo" class="mt-2 small fw-semibold d-none"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-semibold">Mot de passe d’ouverture</label>
+                    <div class="input-group">
+                        <input id="password" type="password" class="form-control" maxlength="128" autocomplete="new-password" />
+                        <button type="button" class="btn btn-outline-secondary" id="togglePwd" title="Afficher / masquer"><i class="bi bi-eye"></i></button>
+                    </div>
+                    <div class="form-text">Il sera demandé pour ouvrir le document. Pensez à le noter : il ne peut pas être récupéré.</div>
+                </div>
+                <div class="mb-4">
+                    <label for="password2" class="form-label fw-semibold">Confirmer le mot de passe</label>
+                    <input id="password2" type="password" class="form-control" maxlength="128" autocomplete="new-password" />
+                    <div id="pwdHelp" class="form-text"></div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-label fw-semibold">Autorisations des lecteurs</div>
+                    <div class="form-check form-switch">
+                        <input id="allowPrint" class="form-check-input" type="checkbox" checked />
+                        <label class="form-check-label" for="allowPrint">Imprimer</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input id="allowCopy" class="form-check-input" type="checkbox" checked />
+                        <label class="form-check-label" for="allowCopy">Copier le texte et les images</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input id="allowModify" class="form-check-input" type="checkbox" />
+                        <label class="form-check-label" for="allowModify">Modifier, annoter et remplir les formulaires</label>
+                    </div>
+                    <div class="form-text">Ces restrictions sont respectées par la plupart des lecteurs PDF, mais pas par tous : seul le mot de passe d’ouverture garantit la confidentialité.</div>
+                </div>
+
+                <details class="mb-2">
+                    <summary class="fw-semibold">Options avancées</summary>
+                    <div class="mt-3">
+                        <label for="ownerPassword" class="form-label">Mot de passe propriétaire (facultatif)</label>
+                        <input id="ownerPassword" type="password" class="form-control" maxlength="128" autocomplete="new-password" />
+                        <div class="form-text">Permet de lever les restrictions. S’il est vide, un mot de passe aléatoire est utilisé et personne ne pourra les lever.</div>
+                    </div>
+                </details>
+
+                <div id="alert" class="alert d-none mt-4 mb-0"></div>
+
+                <button id="submitBtn" type="submit" class="btn btn-danger btn-lg w-100 mt-4" disabled>
+                    <i class="bi bi-lock me-2"></i>Protéger et télécharger
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/pdf-protect.js" asp-append-version="true"></script>
+}

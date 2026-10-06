@@ -1,0 +1,135 @@
+@page
+@model ILovePDF.Pages.ImageBrightenModel
+@{
+    ViewData["Title"] = "Éclaircir une image";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Éclaircir une image</h1>
+    <p class="lead text-secondary">Éclaircissez votre image au maximum et exportez-la en PDF, PNG, JPEG, WebP, BMP ou TIFF.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Colonne réglages -->
+    <div class="col-lg-5">
+        <form id="brightenForm" class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <div id="dropZone" class="drop-zone border-2 border-dashed rounded-4 p-4 text-center mb-4">
+                    <i class="bi bi-brightness-high text-danger fs-1"></i>
+                    <h6 class="mt-2 mb-1">Glissez votre image ici</h6>
+                    <p class="text-muted small mb-2">JPG, PNG, BMP, WebP ou TIFF · @Model.MaxFileSizeMb Mo maximum</p>
+                    <input id="imageFile" type="file" accept="image/jpeg,image/png,image/bmp,image/webp,image/tiff,.jpg,.jpeg,.png,.bmp,.webp,.tif,.tiff" hidden />
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="chooseFile">Choisir une image</button>
+                    <div id="fileInfo" class="mt-2 small fw-semibold d-none"></div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="strength" class="form-label fw-semibold">
+                        Intensité <span id="strengthValue" class="text-muted">100 % (maximum)</span>
+                    </label>
+                    <input id="strength" type="range" class="form-range" min="0" max="100" step="1" value="100" />
+                    <div class="d-flex gap-2 mt-1">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-preset="35">Léger</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-preset="65">Fort</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-preset="100">
+                            <i class="bi bi-brightness-high me-1"></i>Maximum
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-label fw-semibold">Formats d’export</div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input fmt" type="checkbox" id="fmtPdf" value="pdf" checked />
+                                <label class="form-check-label" for="fmtPdf">PDF</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input fmt" type="checkbox" id="fmtPng" value="png" />
+                                <label class="form-check-label" for="fmtPng">PNG</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input fmt" type="checkbox" id="fmtJpg" value="jpg" />
+                                <label class="form-check-label" for="fmtJpg">JPEG</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input fmt" type="checkbox" id="fmtWebp" value="webp" />
+                                <label class="form-check-label" for="fmtWebp">WebP</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input fmt" type="checkbox" id="fmtBmp" value="bmp" />
+                                <label class="form-check-label" for="fmtBmp">BMP</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input fmt" type="checkbox" id="fmtTiff" value="tiff" />
+                                <label class="form-check-label" for="fmtTiff">TIFF</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text">Plusieurs formats cochés : vous recevrez une archive ZIP.</div>
+                </div>
+
+                <div id="pdfOptions" class="mb-2">
+                    <label for="pdfPage" class="form-label fw-semibold">Mise en page du PDF</label>
+                    <select id="pdfPage" class="form-select">
+                        <option value="a4" selected>Page A4 (idéal pour imprimer)</option>
+                        <option value="image">Taille de l’image (sans marge)</option>
+                    </select>
+                </div>
+
+                <div id="alert" class="alert d-none mt-4 mb-0"></div>
+
+                <button id="submitBtn" type="submit" class="btn btn-danger btn-lg w-100 mt-4" disabled>
+                    <i class="bi bi-download me-2"></i>Éclaircir et télécharger
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Colonne aperçu -->
+    <div class="col-lg-7">
+        <div class="wm-preview-sticky">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-eye me-2"></i>Aperçu avant / après</h5>
+
+                    <div id="previewPlaceholder" class="wm-preview-placeholder text-muted text-center">
+                        <i class="bi bi-image display-4"></i>
+                        <p class="mt-2 mb-0">Chargez une image pour voir le résultat.</p>
+                    </div>
+
+                    <div id="previewWrap" class="d-none">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="small fw-semibold text-muted mb-1">Original</div>
+                                <canvas id="beforeCanvas" class="bright-canvas"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small fw-semibold text-muted mb-1">Éclairci</div>
+                                <canvas id="afterCanvas" class="bright-canvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-text mt-2">L’aperçu est réduit ; l’export utilise la résolution d’origine.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/image-brighten.js" asp-append-version="true"></script>
+}

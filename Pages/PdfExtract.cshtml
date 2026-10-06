@@ -1,0 +1,83 @@
+@page
+@model ILovePDF.Pages.PdfExtractModel
+@{
+    ViewData["Title"] = "Extraire des pages PDF";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Extraire des pages</h1>
+    <p class="lead text-secondary">Choisissez une ou plusieurs pages de votre PDF et récupérez-les dans un nouveau fichier.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Colonne réglages -->
+    <div class="col-lg-4">
+        <form id="extractForm" class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <div id="dropZone" class="drop-zone border-2 border-dashed rounded-4 p-4 text-center mb-4">
+                    <i class="bi bi-file-earmark-pdf text-danger fs-1"></i>
+                    <h6 class="mt-2 mb-1">Glissez votre PDF ici</h6>
+                    <p class="text-muted small mb-2">ou cliquez pour sélectionner un fichier</p>
+                    <input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden />
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="chooseFile">Choisir un PDF</button>
+                    <div id="fileInfo" class="mt-2 small fw-semibold d-none"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="pagesInput" class="form-label fw-semibold">Pages à extraire</label>
+                    <input id="pagesInput" class="form-control" placeholder="ex. 1,3,5-8" autocomplete="off" disabled />
+                    <div id="pagesHelp" class="form-text">Cliquez sur les miniatures ou saisissez les numéros.</div>
+                    <div class="d-flex flex-wrap gap-1 mt-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-select="all">Toutes</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-select="none">Aucune</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-select="odd">Impaires</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-select="even">Paires</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-select="invert">Inverser</button>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <div class="form-label fw-semibold">Résultat</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="outMode" id="modeSingle" value="single" checked />
+                        <label class="form-check-label" for="modeSingle">Un seul PDF avec les pages choisies</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="outMode" id="modeSeparate" value="separate" />
+                        <label class="form-check-label" for="modeSeparate">Un PDF par page (archive ZIP)</label>
+                    </div>
+                </div>
+
+                <div id="alert" class="alert d-none mt-4 mb-0"></div>
+
+                <button id="submitBtn" type="submit" class="btn btn-danger btn-lg w-100 mt-4" disabled>
+                    <i class="bi bi-scissors me-2"></i>Extraire et télécharger
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Colonne miniatures -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold m-0"><i class="bi bi-files me-2"></i>Pages du document</h5>
+                    <span id="selectionCount" class="badge text-bg-secondary d-none"></span>
+                </div>
+
+                <div id="gridPlaceholder" class="wm-preview-placeholder text-muted text-center">
+                    <i class="bi bi-file-earmark-pdf display-4"></i>
+                    <p class="mt-2 mb-0">Chargez un PDF pour voir ses pages.</p>
+                </div>
+
+                <div id="pageGrid" class="ext-grid d-none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/pdf-extract.js" asp-append-version="true"></script>
+}

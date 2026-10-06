@@ -1,0 +1,503 @@
+.border-dashed {
+    border-style: dashed !important;
+}
+
+.drop-zone {
+    border-color: #dc3545;
+    background-color: #ffffff;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+    .drop-zone.dragover {
+        background-color: #f8d7da;
+        border-color: #b02a37;
+        transform: scale(1.01);
+    }
+
+.file-card {
+    transition: background-color 0.15s ease-in-out;
+    cursor: grab;
+}
+
+    .file-card:active {
+        cursor: grabbing;
+    }
+
+.drag-handle {
+    cursor: grab;
+    color: #6c757d;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #e9ecef !important;
+}
+
+.sortable-chosen {
+    background-color: #f8f9fa;
+}
+
+
+.image-card {
+    overflow: hidden;
+}
+
+.image-preview-wrapper {
+    height: 220px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+}
+
+.image-drag-handle {
+    cursor: grab;
+    color: #6c757d;
+}
+
+.image-drag-handle:active {
+    cursor: grabbing;
+}
+
+
+/* ---- Caviardage PDF ---- */
+.redact-page {
+    position: relative;
+    margin: 0 auto 1.25rem;
+    max-width: 820px;
+    background: #fff;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .15);
+    line-height: 0;
+}
+
+.redact-page canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.redact-page-label {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
+    z-index: 3;
+    line-height: 1.2;
+    pointer-events: none;
+}
+
+.redact-overlay {
+    position: absolute;
+    inset: 0;
+    cursor: crosshair;
+    touch-action: none;
+    user-select: none;
+}
+
+.redact-rect {
+    position: absolute;
+    background: rgba(0, 0, 0, .72);
+    outline: 2px solid #dc3545;
+}
+
+.redact-rect .redact-rect-remove {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #dc3545;
+    color: #fff;
+    font-size: 14px;
+    line-height: 22px;
+    cursor: pointer;
+    display: none;
+}
+
+.redact-rect:hover .redact-rect-remove {
+    display: block;
+}
+
+.redact-draft {
+    position: absolute;
+    background: rgba(220, 53, 69, .25);
+    border: 2px dashed #dc3545;
+    pointer-events: none;
+}
+
+
+/* ---- Filigrane PDF : aperçu ---- */
+.wm-preview-sticky {
+    position: sticky;
+    top: 1rem;
+}
+
+.wm-preview {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .15);
+    line-height: 0;
+}
+
+.wm-preview canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.wm-preview-placeholder {
+    padding: 4rem 1rem;
+    border: 2px dashed #dee2e6;
+    border-radius: .75rem;
+}
+
+
+/* ---- Comparaison PDF ---- */
+.cmp-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fff;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .15);
+}
+
+.cmp-legend {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.cmp-legend-del { background: #dc3545; }
+.cmp-legend-ins { background: #198754; }
+
+.cmp-text-diff {
+    white-space: pre-wrap;
+    line-height: 1.7;
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.cmp-text-diff del {
+    background: #f8d7da;
+    color: #842029;
+    text-decoration: line-through;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+.cmp-text-diff ins {
+    background: #d1e7dd;
+    color: #0f5132;
+    text-decoration: none;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+#cmp-table-body tr.table-active {
+    --bs-table-bg-state: #f8d7da33;
+}
+
+
+/* ---- Éclaircir une image ---- */
+.bright-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fff;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .15);
+}
+
+
+/* ---- Extraire des pages PDF ---- */
+.ext-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: .75rem;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding: .25rem;
+}
+
+.ext-card {
+    position: relative;
+    border: 2px solid #dee2e6;
+    border-radius: .5rem;
+    background: #fff;
+    padding: .4rem;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.ext-card:hover {
+    border-color: #ea868f;
+}
+
+.ext-card.selected {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, .25);
+    background: #fff5f5;
+}
+
+.ext-thumb {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    line-height: 0;
+}
+
+.ext-thumb canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.ext-label {
+    font-size: .8rem;
+    font-weight: 600;
+    margin-top: .25rem;
+}
+
+.ext-check {
+    position: absolute;
+    top: .1rem;
+    right: .3rem;
+    color: #dc3545;
+    font-size: 1.2rem;
+    display: none;
+    background: #fff;
+    border-radius: 50%;
+    line-height: 1;
+}
+
+.ext-card.selected .ext-check {
+    display: block;
+}
+
+
+/* ---- Accueil (hub d'outils) ---- */
+.hub-hero {
+    padding: 2rem 0 2.5rem;
+}
+
+.hub-search {
+    position: relative;
+    max-width: 560px;
+}
+
+.hub-search .bi-search {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+}
+
+.hub-search input {
+    padding-left: 2.75rem;
+    border-radius: 2rem;
+}
+
+.tool-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .12) !important;
+}
+
+.tool-icon {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .75rem;
+    background: #fdecee;
+    color: #dc3545;
+    font-size: 1.5rem;
+}
+
+/* ---- Organiser les pages ---- */
+.org-thumb {
+    height: 140px;
+    min-height: 140px;
+}
+
+.org-thumb canvas {
+    transition: transform .2s ease;
+}
+
+.org-card {
+    cursor: grab;
+}
+
+.org-card:active {
+    cursor: grabbing;
+}
+
+.ext-actions {
+    display: flex;
+    justify-content: center;
+    gap: .25rem;
+    margin-top: .35rem;
+}
+
+.ext-actions .btn {
+    padding: .1rem .4rem;
+    border: 1px solid #dee2e6;
+}
+
+/* ---- Numéroter les pages : aperçu ---- */
+.num-preview {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .15);
+    line-height: 0;
+}
+
+.num-preview canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.num-label {
+    position: absolute;
+    line-height: 1;
+    white-space: nowrap;
+    font-family: Arial, Helvetica, sans-serif;
+    pointer-events: none;
+}
+
+
+/* ---- Signer un PDF ---- */
+.sig-pad {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fff;
+    border: 2px dashed #ced4da;
+    border-radius: .5rem;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.sig-pad-small {
+    cursor: default;
+    background-image: linear-gradient(45deg, #f1f3f5 25%, transparent 25%, transparent 75%, #f1f3f5 75%),
+                      linear-gradient(45deg, #f1f3f5 25%, transparent 25%, transparent 75%, #f1f3f5 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 8px 8px;
+}
+
+.sig-thumb {
+    max-width: 120px;
+    max-height: 56px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: .35rem;
+    padding: 2px;
+}
+
+.sign-stage {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .15);
+    line-height: 0;
+}
+
+.sign-stage canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.sign-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.sign-item {
+    position: absolute;
+    border: 1px dashed transparent;
+    cursor: move;
+    touch-action: none;
+    user-select: none;
+}
+
+.sign-item:hover,
+.sign-item.selected {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, .06);
+}
+
+.sign-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.sign-handle {
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #dc3545;
+    border: 2px solid #fff;
+    cursor: nwse-resize;
+    display: none;
+}
+
+.sign-del {
+    position: absolute;
+    top: -11px;
+    right: -11px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #dc3545;
+    color: #fff;
+    font-size: 14px;
+    line-height: 22px;
+    cursor: pointer;
+    display: none;
+}
+
+.sign-item.selected .sign-handle,
+.sign-item.selected .sign-del {
+    display: block;
+}

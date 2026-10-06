@@ -1,0 +1,59 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Accueil";
+}
+
+<div class="hub-hero text-center">
+    <h1 class="display-5 fw-bold text-dark">Tous vos outils PDF au même endroit</h1>
+    <p class="lead text-secondary mb-4">@ToolCatalog.All.Count() outils pour organiser, convertir, modifier et sécuriser vos documents.</p>
+    <div class="hub-search mx-auto">
+        <i class="bi bi-search"></i>
+        <input id="toolSearch" type="search" class="form-control form-control-lg" placeholder="Rechercher un outil (fusionner, filigrane, mot de passe…)" autocomplete="off" />
+    </div>
+</div>
+
+@foreach (var category in ToolCatalog.Categories)
+{
+    <section class="hub-section mb-5">
+        <h2 class="h5 fw-bold mb-3"><i class="bi @category.Icon text-danger me-2"></i>@category.Name</h2>
+        <div class="row g-3">
+            @foreach (var tool in category.Tools)
+            {
+                var haystack = (tool.Title + " " + tool.Description + " " + category.Name).ToLowerInvariant();
+                <div class="col-sm-6 col-lg-4" data-tool="@haystack">
+                    <a asp-page="@tool.Page" class="card tool-card h-100 border-0 shadow-sm text-decoration-none">
+                        <div class="card-body p-4">
+                            <div class="tool-icon mb-3"><i class="bi @tool.Icon"></i></div>
+                            <h3 class="h6 fw-bold text-dark mb-1">@tool.Title</h3>
+                            <p class="small text-secondary mb-0">@tool.Description</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+<div id="noResult" class="text-center text-muted py-5 d-none">
+    <i class="bi bi-emoji-neutral display-4"></i>
+    <p class="mt-2 mb-0">Aucun outil ne correspond à votre recherche.</p>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById('toolSearch');
+            const cards = Array.from(document.querySelectorAll('[data-tool]'));
+            const sections = Array.from(document.querySelectorAll('.hub-section'));
+            const empty = document.getElementById('noResult');
+
+            input.addEventListener('input', () => {
+                const q = input.value.trim().toLowerCase();
+                cards.forEach(c => c.classList.toggle('d-none', q !== '' && !c.dataset.tool.includes(q)));
+                sections.forEach(s => s.classList.toggle('d-none', !s.querySelector('[data-tool]:not(.d-none)')));
+                empty.classList.toggle('d-none', sections.some(s => !s.classList.contains('d-none')));
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,174 @@
+@page
+@model ILovePDF.Pages.PdfCompareModel
+@{
+    ViewData["Title"] = "Comparer deux PDF";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Comparer deux PDF</h1>
+    <p class="lead text-secondary">Repérez les différences visuelles et textuelles, page par page. Tout se passe dans votre navigateur.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+
+        <!-- Sélection des deux fichiers -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="cmp-slot drop-zone border-2 border-dashed rounded-4 p-4 text-center bg-white shadow-sm" data-slot="A">
+                    <span class="badge bg-danger mb-2">A</span>
+                    <h5 class="mb-1">Document de référence</h5>
+                    <p class="text-muted small mb-2">La version « avant »</p>
+                    <input type="file" class="d-none" accept="application/pdf,.pdf" data-input="A" />
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-choose="A">
+                        <i class="bi bi-folder2-open me-1"></i>Choisir un PDF
+                    </button>
+                    <div class="small fw-semibold mt-2 text-truncate d-none" data-info="A"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="cmp-slot drop-zone border-2 border-dashed rounded-4 p-4 text-center bg-white shadow-sm" data-slot="B">
+                    <span class="badge bg-success mb-2">B</span>
+                    <h5 class="mb-1">Document à comparer</h5>
+                    <p class="text-muted small mb-2">La version « après »</p>
+                    <input type="file" class="d-none" accept="application/pdf,.pdf" data-input="B" />
+                    <button type="button" class="btn btn-outline-success btn-sm" data-choose="B">
+                        <i class="bi bi-folder2-open me-1"></i>Choisir un PDF
+                    </button>
+                    <div class="small fw-semibold mt-2 text-truncate d-none" data-info="B"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cmp-alert" class="alert alert-danger d-none shadow-sm" role="alert"></div>
+
+        <!-- Réglages -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="cmp-tolerance" class="form-label fw-semibold mb-1">
+                            Tolérance de couleur <span id="cmp-tolerance-value" class="text-muted">16</span>
+                        </label>
+                        <input id="cmp-tolerance" type="range" class="form-range" min="0" max="100" step="1" value="16" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="cmp-threshold" class="form-label fw-semibold mb-1">Seuil de différence</label>
+                        <select id="cmp-threshold" class="form-select">
+                            <option value="0">Strict — tout pixel</option>
+                            <option value="0.01" selected>0,01 % de la page</option>
+                            <option value="0.1">0,1 % de la page</option>
+                            <option value="1">1 % de la page</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 d-flex flex-wrap gap-2 justify-content-md-end">
+                        <button type="button" id="cmp-swap" class="btn btn-outline-secondary" disabled>
+                            <i class="bi bi-arrow-left-right me-1"></i>Inverser A / B
+                        </button>
+                        <button type="button" id="cmp-run" class="btn btn-danger fw-bold px-4" disabled>
+                            <i class="bi bi-intersect me-1"></i>Comparer
+                        </button>
+                    </div>
+                </div>
+                <div class="form-text mt-2">
+                    Une tolérance plus haute ignore les petites variations de couleur (anti-crénelage, compression). Les pages sont comparées à taille réelle, alignées en haut à gauche.
+                </div>
+            </div>
+        </div>
+
+        <!-- Progression -->
+        <div id="cmp-progress" class="d-none text-center p-4 bg-white rounded-4 shadow-sm mb-4">
+            <div class="spinner-border text-danger mb-2" role="status"></div>
+            <div class="fw-bold" id="cmp-progress-text">Comparaison en cours...</div>
+        </div>
+
+        <!-- Résultats -->
+        <div id="cmp-results" class="d-none">
+            <div id="cmp-verdict" class="alert shadow-sm d-flex flex-wrap justify-content-between align-items-center gap-2"></div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:80px">Page</th>
+                                <th>Visuel</th>
+                                <th>Texte</th>
+                                <th class="text-end" style="width:110px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cmp-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Détail d'une page -->
+            <div id="cmp-detail" class="card border-0 shadow-sm mb-5 d-none">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-secondary" id="cmp-prev" title="Page précédente"><i class="bi bi-chevron-left"></i></button>
+                            <span class="btn btn-outline-secondary disabled" id="cmp-page-label">Page 1</span>
+                            <button type="button" class="btn btn-outline-secondary" id="cmp-next" title="Page suivante"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Mode d'affichage">
+                            <button type="button" class="btn btn-outline-danger active" data-view="diff"><i class="bi bi-intersect me-1"></i>Différences</button>
+                            <button type="button" class="btn btn-outline-danger" data-view="side"><i class="bi bi-layout-split me-1"></i>Côte à côte</button>
+                            <button type="button" class="btn btn-outline-danger" data-view="blend"><i class="bi bi-layers-half me-1"></i>Fondu</button>
+                            <button type="button" class="btn btn-outline-danger" data-view="text"><i class="bi bi-fonts me-1"></i>Texte</button>
+                        </div>
+
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="cmp-download-diff">
+                            <i class="bi bi-image me-1"></i>Image des différences
+                        </button>
+                    </div>
+
+                    <div id="cmp-detail-loading" class="text-center text-muted py-5 d-none">
+                        <div class="spinner-border spinner-border-sm me-2"></div>Rendu de la page...
+                    </div>
+
+                    <!-- Vue différences -->
+                    <div data-pane="diff">
+                        <div class="small mb-2">
+                            <span class="cmp-legend cmp-legend-del"></span> Présent dans A seulement
+                            <span class="cmp-legend cmp-legend-ins ms-3"></span> Présent dans B seulement
+                        </div>
+                        <canvas id="cmp-canvas-diff" class="cmp-canvas"></canvas>
+                    </div>
+
+                    <!-- Vue côte à côte -->
+                    <div data-pane="side" class="d-none">
+                        <div class="row g-3">
+                            <div class="col-md-6"><div class="small fw-semibold mb-1"><span class="badge bg-danger">A</span> Référence</div><canvas id="cmp-canvas-a" class="cmp-canvas"></canvas></div>
+                            <div class="col-md-6"><div class="small fw-semibold mb-1"><span class="badge bg-success">B</span> Comparé</div><canvas id="cmp-canvas-b" class="cmp-canvas"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Vue fondu -->
+                    <div data-pane="blend" class="d-none">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <span class="badge bg-danger">A</span>
+                            <input type="range" id="cmp-blend" class="form-range flex-grow-1" min="0" max="100" value="50" />
+                            <span class="badge bg-success">B</span>
+                        </div>
+                        <canvas id="cmp-canvas-blend" class="cmp-canvas"></canvas>
+                    </div>
+
+                    <!-- Vue texte -->
+                    <div data-pane="text" class="d-none">
+                        <div class="small mb-2" id="cmp-text-summary"></div>
+                        <div id="cmp-text-diff" class="cmp-text-diff border rounded p-3 bg-white"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.compareConfig = { maxFileSizeMb: @Model.MaxFileSizeMb };
+    </script>
+    <script src="~/js/pdf-compare.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,152 @@
+@page
+@model ILovePDF.Pages.PdfSignModel
+@{
+    ViewData["Title"] = "Signer un PDF";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-5 fw-bold text-dark">Signer un PDF</h1>
+    <p class="lead text-secondary">Dessinez, tapez ou importez votre signature, puis placez-la où vous voulez sur le document.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Colonne réglages -->
+    <div class="col-lg-5">
+        <form id="signForm" class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <h6 class="fw-bold"><span class="badge text-bg-danger me-2">1</span>Document</h6>
+                <div id="dropZone" class="drop-zone border-2 border-dashed rounded-4 p-3 text-center mb-4">
+                    <i class="bi bi-file-earmark-pdf text-danger fs-2"></i>
+                    <p class="text-muted small mb-2">Glissez votre PDF ici ou</p>
+                    <input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden />
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="chooseFile">Choisir un PDF</button>
+                    <div id="fileInfo" class="mt-2 small fw-semibold d-none"></div>
+                </div>
+
+                <h6 class="fw-bold"><span class="badge text-bg-danger me-2">2</span>Votre signature</h6>
+                <ul class="nav nav-pills nav-fill mb-3" id="sigTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tabDrawBtn" data-bs-toggle="pill" data-bs-target="#tabDraw" type="button" role="tab"><i class="bi bi-pencil me-1"></i>Dessiner</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tabTypeBtn" data-bs-toggle="pill" data-bs-target="#tabType" type="button" role="tab"><i class="bi bi-fonts me-1"></i>Taper</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tabImportBtn" data-bs-toggle="pill" data-bs-target="#tabImport" type="button" role="tab"><i class="bi bi-image me-1"></i>Importer</button>
+                    </li>
+                </ul>
+
+                <div class="mb-3 d-flex align-items-center gap-2">
+                    <label for="penColor" class="form-label fw-semibold mb-0">Encre</label>
+                    <select id="penColor" class="form-select form-select-sm w-auto">
+                        <option value="#111111">Noir</option>
+                        <option value="#1a3fa8">Bleu</option>
+                        <option value="#7a1020">Bordeaux</option>
+                    </select>
+                </div>
+
+                <div class="tab-content mb-3">
+                    <div class="tab-pane fade show active" id="tabDraw" role="tabpanel">
+                        <canvas id="drawPad" class="sig-pad" width="640" height="240"></canvas>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <span class="form-text m-0">Dessinez avec la souris, le doigt ou un stylet.</span>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearPad"><i class="bi bi-eraser me-1"></i>Effacer</button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tabType" role="tabpanel">
+                        <input id="typeText" class="form-control mb-2" placeholder="Votre nom" maxlength="60" />
+                        <select id="typeFont" class="form-select mb-2">
+                            <option value="Dancing Script">Dancing Script</option>
+                            <option value="Great Vibes">Great Vibes</option>
+                            <option value="Caveat">Caveat</option>
+                        </select>
+                        <canvas id="typeCanvas" class="sig-pad sig-pad-small" width="640" height="160"></canvas>
+                    </div>
+                    <div class="tab-pane fade" id="tabImport" role="tabpanel">
+                        <input id="importFile" type="file" class="form-control mb-2" accept="image/png,image/jpeg,image/webp" />
+                        <div class="form-check form-switch mb-2">
+                            <input id="removeBg" class="form-check-input" type="checkbox" checked />
+                            <label class="form-check-label" for="removeBg">Rendre le fond blanc transparent</label>
+                        </div>
+                        <canvas id="importCanvas" class="sig-pad sig-pad-small" width="640" height="160"></canvas>
+                        <div class="form-text">Une photo de votre signature sur papier blanc fonctionne très bien.</div>
+                    </div>
+                </div>
+
+                <button type="button" id="useSignature" class="btn btn-outline-danger w-100">
+                    <i class="bi bi-check2-circle me-1"></i>Utiliser cette signature
+                </button>
+
+                <div id="activeSig" class="d-none mt-3 p-2 border rounded bg-light">
+                    <div class="d-flex align-items-center gap-3">
+                        <img id="sigPreview" alt="Signature active" class="sig-thumb" />
+                        <div class="flex-grow-1 small">
+                            <div class="fw-semibold text-success"><i class="bi bi-check-circle-fill me-1"></i>Signature prête</div>
+                            <div class="form-check mt-1">
+                                <input id="remember" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" for="remember">Mémoriser sur cet appareil</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mt-4"><span class="badge text-bg-danger me-2">3</span>Placement</h6>
+                <div class="d-grid gap-2">
+                    <button type="button" id="addBtn" class="btn btn-danger" disabled><i class="bi bi-plus-circle me-1"></i>Placer sur la page affichée</button>
+                    <div class="btn-group">
+                        <button type="button" id="copyAllBtn" class="btn btn-outline-secondary btn-sm" disabled title="Copie la signature sélectionnée sur les pages qui n’en ont pas">Sur toutes les pages</button>
+                        <button type="button" id="removeBtn" class="btn btn-outline-secondary btn-sm" disabled>Supprimer</button>
+                        <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-sm" disabled>Tout retirer</button>
+                    </div>
+                </div>
+                <div id="placementSummary" class="form-text mt-2">Aucune signature placée.</div>
+
+                <div class="alert alert-light border small mt-3 mb-0">
+                    <i class="bi bi-info-circle me-1"></i>Il s’agit d’une <strong>signature visuelle</strong> (une image apposée sur la page).
+                    Elle ne remplace pas une signature électronique qualifiée avec certificat.
+                </div>
+
+                <div id="alert" class="alert d-none mt-3 mb-0"></div>
+
+                <button id="submitBtn" type="submit" class="btn btn-danger btn-lg w-100 mt-4" disabled>
+                    <i class="bi bi-vector-pen me-2"></i>Signer et télécharger
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Colonne document -->
+    <div class="col-lg-7">
+        <div class="wm-preview-sticky">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold m-0"><i class="bi bi-file-earmark-text me-2"></i>Document</h5>
+                        <div id="pageNav" class="btn-group btn-group-sm d-none">
+                            <button type="button" class="btn btn-outline-secondary" id="prevPage" title="Page précédente"><i class="bi bi-chevron-left"></i></button>
+                            <span class="btn btn-outline-secondary disabled" id="pageLabel">1 / 1</span>
+                            <button type="button" class="btn btn-outline-secondary" id="nextPage" title="Page suivante"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="previewPlaceholder" class="wm-preview-placeholder text-muted text-center">
+                        <i class="bi bi-file-earmark-pdf display-4"></i>
+                        <p class="mt-2 mb-0">Chargez un PDF pour commencer.</p>
+                    </div>
+
+                    <div id="stage" class="sign-stage d-none">
+                        <canvas id="pageCanvas"></canvas>
+                        <div id="signLayer" class="sign-layer"></div>
+                    </div>
+                    <div id="stageHelp" class="form-text mt-2 d-none">Glissez la signature pour la déplacer, tirez le coin pour la redimensionner.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@@600&family=Dancing+Script:wght@@600&family=Great+Vibes&display=swap" />
+    <script src="~/js/pdf-sign.js" asp-append-version="true"></script>
+}
