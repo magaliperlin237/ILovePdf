@@ -44,6 +44,17 @@ Boîte à outils PDF / images en ASP.NET Core 8 (Razor Pages + API), PDFsharp et
 - Les messages d'erreur destinés à l'utilisateur sont levés en `ArgumentException` dans les services et renvoyés en `400` par les contrôleurs.
 - Quand une logique existe en C# **et** en JavaScript (aperçu en direct), un commentaire `NB :` le signale : les deux versions doivent rester identiques.
 
+## Docker
+
+Construire et démarrer l'application depuis la racine du dépôt :
+
+```sh
+docker build -t ilovepdf .
+docker run --rm -p 8080:8080 ilovepdf
+```
+
+L'application est alors disponible sur `http://localhost:8080`. L'image installe également les polices Liberation, utilisées par PDFsharp sous Linux.
+
 ## Notes sur les outils les plus délicats
 
 - **Compression** : seules les images JPEG (`/DCTDecode`) sont recompressées (définition et qualité réduites selon le niveau). Le texte et les vecteurs ne sont pas modifiés ; si le résultat n'est pas plus léger, le fichier d'origine est renvoyé.
